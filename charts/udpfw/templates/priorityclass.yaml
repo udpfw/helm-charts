@@ -1,0 +1,9 @@
+{{- if .Values.daemonset.pod.priorityClassCreate}}
+apiVersion: scheduling.k8s.io/v1
+description: Used for UDPFW Components to be scheduled with higher priority.
+kind: PriorityClass
+metadata:
+  name: {{ .Values.daemonset.pod.priorityClassName | default (include "udpfw.fullname" . ) }}
+preemptionPolicy: {{ .Values.daemonset.pod.priorityPreemptionPolicyValue }}
+value: {{ .Values.daemonset.pod.priorityClassValue }}
+{{- end }}
