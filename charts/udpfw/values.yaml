@@ -22,7 +22,7 @@ udpfw:
   ## Define the image to work with
   image:
     # udpfw.image.repository -- Repository to use
-    repository: ghcr.io/udpfw/dispatch
+    repository: ghcr.io/udpfw/udpfw
 
     # udpfw.image.tag -- Overrides the global Helm image tag whose default is the chart appVersion
     tag: ""

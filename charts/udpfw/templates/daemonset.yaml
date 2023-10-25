@@ -42,6 +42,8 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.udpfw.image.repository }}:{{ .Values.udpfw.image.tag | default .Chart.AppVersion }}"
+          command:
+            - /opt/udpfw/dispatch
           imagePullPolicy: {{ .Values.udpfw.image.pullPolicy }}
           {{- with .Values.udpfw.securityContext }}
           securityContext: {{- toYaml . | nindent 12 }}
