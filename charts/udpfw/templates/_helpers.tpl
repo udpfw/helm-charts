@@ -55,9 +55,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Create the name of the service account to use
 */}}
+{{- define "udpfw.nodelet.serviceAccountName" -}}
+{{- if .Values.dispatch.serviceAccount.create }}
+{{- default (printf "%s-nodelet" (include "udpfw.fullname" . )) .Values.nodelet.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.nodelet.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the dispatch service account to use
+*/}}
 {{- define "udpfw.dispatch.serviceAccountName" -}}
 {{- if .Values.dispatch.serviceAccount.create }}
-{{- default (include "udpfw.fullname" .) .Values.dispatch.serviceAccount.name }}
+{{- default (printf "%s-dispatch" (include "udpfw.fullname" . )) .Values.dispatch.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.dispatch.serviceAccount.name }}
 {{- end }}

@@ -96,7 +96,6 @@ dispatch:
     rollingUpdate:
       maxUnavailable: "10%"
 
-
   container:
     # dispatch.container.defaultPort -- Default port to listen TCP packets
     defaultPort: 2727
@@ -219,6 +218,144 @@ dispatch:
     affinity: {}
 
   # dispatch.serviceAccount -- Service Account configuration
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # Labels to add to the service account
+    labels: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+## nodelet -- Nodelet daemonset configuration
+nodelet:
+
+  # nodelet.enabled -- Enables/disables nodelet manifests
+  enabled: true
+
+  # nodelet.annotations -- Adds annotations to the daemonset
+  annotations: {}
+
+  # nodelet.labels -- Adds labels to the daemonset
+  labels: {}
+
+  container:
+
+    # nodelet.container.iface -- The interface name from which UDP packets will be captured
+    iface: ""
+
+    # nodelet.container.dispatchAddress -- "IP and port to the Dispatch service running on the local cluster"
+    dispatchAddress: ""
+
+    # nodelet.container.enableDebugLog -- Enable log in debug level
+    enableDebugLog: false
+
+    # nodelet.container.securityContext -- Allows you to overwrite the default PodSecurityContext on the nodelet container
+    securityContext:
+      capabilities:
+        add:
+          - NET_ADMIN
+      privileged: true
+
+    # nodelet.container.resources -- Resource requests and limits for this container.
+    resources: {}
+    #  requests:
+    #    cpu: 200m
+    #    memory: 256Mi
+    #  limits:
+    #    cpu: 200m
+    #    memory: 256Mi
+
+    # nodelet.container.livenessProbe -- Add liveness probe settings
+    # @default -- Every 15s / 6 KO / 1 OK
+    livenessProbe: {}
+
+    # nodelet.container.readinessProbe -- Add readiness probe settings
+    readinessProbe: {}
+
+    # nodelet.container.env -- Additional environment variables for this container
+    env: []
+
+    # nodelet.container.envFrom -- Set environment variables specific to container from configMaps and/or secrets
+    envFrom: []
+    #   - configMapRef:
+    #       name: <CONFIGMAP_NAME>
+    #   - secretRef:
+    #       name: <SECRET_NAME>
+
+    # nodelet.container.envDict -- Set environment variables specific to this container defined in a dict
+    envDict: {}
+    #   <ENV_VAR_NAME>: <ENV_VAR_VALUE>
+
+  # nodelet.pod -- Daemonset configuration
+  pod:
+    # nodelet.pod.annotations -- Adds annotations to the daemonset
+    annotations: {}
+    # daemonset.labels -- Adds labels to the daemonset
+    labels: {}
+    # daemonset.revisionHistoryLimit -- The number of ControllerRevision to keep in this DaemonSet.
+    revisionHistoryLimit: 1
+
+    # daemonset.updateStrategy -- Allow the DaemonSet to perform a rolling update on helm update
+
+    ## ref: https://kubernetes.io/docs/tasks/manage-daemon/update-daemon-set/
+    updateStrategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: "10%"
+
+    # nodelet.pod.useHostNetwork -- Bind ports on the hostNetwork
+
+    ## Useful for CNI networking where hostPort might
+    ## not be supported. The ports need to be available on all hosts. It Can be
+    ## used for custom metrics instead of a service endpoint.
+    ##
+    ## WARNING: Make sure that hosts using this are properly firewalled otherwise
+    ## metrics and traces are accepted from any host able to connect to this host.
+    useHostNetwork: false
+
+    # nodelet.pod.dnsPolicy -- Pod's DNS policy
+
+    ## See https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+    dnsPolicy: "ClusterFirst"
+
+    # nodelet.pod.imagePullSecrets -- Repository pullSecret (ex: specify docker registry credentials)
+
+    ## See https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
+    imagePullSecrets: []
+    #   - name: "<REG_SECRET>"
+
+    # nodelet.pod.tolerations -- Allow the Deployment to schedule on tainted nodes (requires Kubernetes >= 1.6)
+    tolerations:
+      - operator: Exists
+
+    # nodelet.pod.nodeSelector -- Allow the Deployment to schedule on selected nodes
+
+    ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+    nodeSelector: {}
+
+    # nodelet.pod.affinity -- Allow the Deployment to schedule using affinity rules
+
+    ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+    affinity: {}
+
+    # nodelet.pod.priorityClassCreate -- Creates a priorityClass for the Daemonset pods.
+    priorityClassCreate: true
+
+    # nodelet.pod.priorityClassName -- Sets PriorityClassName if defined
+    priorityClassName:
+
+    # nodelet.pod.priorityPreemptionPolicyValue -- Set to "Never" to change the PriorityClass to non-preempting
+    priorityPreemptionPolicyValue: PreemptLowerPriority
+
+    # daemonset.pod.priorityClassValue -- Value used to specify the priority of the scheduling of Daemonset pods.
+
+    ## The PriorityClass uses PreemptLowerPriority.
+    priorityClassValue: 1000000000
+
+  # nodelet.serviceAccount -- Service Account configuration
   serviceAccount:
     # Specifies whether a service account should be created
     create: true

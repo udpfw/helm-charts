@@ -1,0 +1,9 @@
+{{- if .Values.nodelet.pod.priorityClassCreate}}
+apiVersion: scheduling.k8s.io/v1
+description: Used for udpfw nodelet Components to be scheduled with higher priority.
+kind: PriorityClass
+metadata:
+  name: {{ .Values.nodelet.pod.priorityClassName | default (printf "%s-nodelet" (include "udpfw.fullname" . )) }}
+preemptionPolicy: {{ .Values.nodelet.pod.priorityPreemptionPolicyValue }}
+value: {{ .Values.nodelet.pod.priorityClassValue }}
+{{- end }}

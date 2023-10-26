@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "udpfw.fullname" . }}-nodelet
+  namespace: {{ .Release.Namespace | quote }}
+  {{- with .Values.nodelet.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels: {{- include "udpfw.labels" . | nindent 4 }}
+    app.kubernetes.io/name: nodelet
+    {{- with .Values.nodelet.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  revisionHistoryLimit: {{ .Values.nodelet.pod.revisionHistoryLimit }}
+  updateStrategy: {{- toYaml .Values.nodelet.pod.updateStrategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "udpfw.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: nodelet
+      {{- with .Values.nodelet.pod.labels }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "udpfw.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/name: nodelet
+        {{- with .Values.nodelet.pod.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodelet.pod.annotations }}
+      annotations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.nodelet.pod.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodelet.pod.useHostNetwork }}
+      hostNetwork: true
+      {{- end }}
+      {{- if or .Values.nodelet.pod.priorityClassCreate .Values.nodelet.pod.priorityClassName }}
+      priorityClassName: {{ .Values.nodelet.pod.priorityClassName | default (include "udpfw.fullname" . ) }}
+      {{- end }}
+      containers:
+        - name: nodelet
+          image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          {{- with .Values.nodelet.container.securityContext }}
+          securityContext: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command:
+            - /opt/udpfw/nodelet
+          {{- with .Values.nodelet.container.livenessProbe }}
+          livenessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.nodelet.container.readinessProbe }}
+          readinessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.nodelet.container.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.nodelet.container.envFrom }}
+          envFrom: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- with .Values.nodelet.container.env }}
+              {{- toYaml . | nindent 10 }}
+            {{- end }}
+            {{- if .Values.nodelet.container.envDict }}
+            {{- range $key, $value := .Values.nodelet.container.envDict }}
+            - name: {{ quote $key }}
+              value: {{ quote $value }}
+            {{- end }}
+            {{- end }}
+            - name: UDPFW_NODELET_IFACE
+              value: {{ .Values.nodelet.container.iface | quote }}
+            - name: UDPFW_DISPATCH_ADDRESS
+              value: {{ default (printf "%s-dispatch.svc.cluster.local" (include "udpfw.fullname" . )) .Values.nodelet.container.dispatchAddress | quote }}
+            {{- if .Values.nodelet.container.enableDebugLog }}
+            - name: UDPFW_NODELET_DEBUG
+              value: "true"
+            {{- end }}
+      {{- with .Values.nodelet.pod.tolerations }}
+      tolerations: {{ toYaml .| nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodelet.pod.affinity }}
+      affinity: {{ toYaml .| nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodelet.pod.nodeSelector }}
+      nodeSelector: {{ toYaml .| nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "udpfw.nodelet.serviceAccountName" . }}
