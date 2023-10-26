@@ -2,7 +2,7 @@ apiVersion: v2
 name: udpfw
 description: A Helm chart for udfpw
 type: application
-version: 0.0.1
+version: 0.0.2
 appVersion: "v0.1-alpha1"
 sources:
   - https://github.com/udpfw/udpfw
