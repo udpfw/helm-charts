@@ -3,6 +3,32 @@ entries:
   udpfw:
   - apiVersion: v2
     appVersion: v0.1-alpha4
+    created: "2023-10-26T15:51:10.590151471Z"
+    dependencies:
+    - condition: nats.enabled
+      name: nats
+      repository: https://nats-io.github.io/k8s/helm/charts
+      version: 1.1.2
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 18.1.6
+    description: A Helm chart for udpfw
+    digest: 3c8df6bcea3f7e60d9af5b3146fe0edc5ccf8db5e78761345d6529976a8453b7
+    maintainers:
+    - email: hey@vito.io
+      name: Vito Sartori
+    - email: thalescostaa@gmail.com
+      name: Thales Costa
+    name: udpfw
+    sources:
+    - https://github.com/udpfw/udpfw
+    type: application
+    urls:
+    - https://github.com/udpfw/helm-charts/releases/download/udpfw-0.0.3/udpfw-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
+    appVersion: v0.1-alpha4
     created: "2023-10-26T15:46:51.492776312Z"
     dependencies:
     - condition: nats.enabled
@@ -53,4 +79,4 @@ entries:
     urls:
     - https://github.com/udpfw/helm-charts/releases/download/udpfw-0.0.1/udpfw-0.0.1.tgz
     version: 0.0.1
-generated: "2023-10-26T15:46:51.492794412Z"
+generated: "2023-10-26T15:51:10.590210071Z"
