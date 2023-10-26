@@ -132,6 +132,11 @@ daemonset:
     ## metrics and traces are accepted from any host able to connect to this host.
     useHostNetwork: false
 
+    # daemonset.pod.dnsPolicy -- Pod's DNS policy
+
+    ## See https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+    dnsPolicy: "ClusterFirst"
+
     # daemonset.pod.imagePullSecrets -- Repository pullSecret (ex: specify docker registry credentials)
 
     ## See https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod

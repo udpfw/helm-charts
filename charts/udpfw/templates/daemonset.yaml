@@ -36,6 +36,9 @@ spec:
       {{- with .Values.daemonset.pod.useHostNetwork }}
       hostNetwork: true
       {{- end }}
+      {{- with .Values.daemonset.pod.dnsPolicy }}
+      dnsPolicy: {{ . | quote }}
+      {{- end }}
       {{- if or .Values.daemonset.pod.priorityClassCreate .Values.daemonset.pod.priorityClassName }}
       priorityClassName: {{ .Values.daemonset.pod.priorityClassName | default (include "udpfw.fullname" . ) }}
       {{- end }}
