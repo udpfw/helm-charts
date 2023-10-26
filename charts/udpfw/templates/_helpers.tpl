@@ -130,7 +130,7 @@ PubSub NATS environment variables
 PubSub Redis environment variables
 */}}
 {{- define "udpfw.pubsub-envs.redis" -}}
-- name: UDPFW_DISPATCH_REDIS_PATH
+- name: UDPFW_DISPATCH_REDIS_URL
   value: {{ .Values.dispatch.redis.url | default (printf "redis://%s-redis-master:6379/0" (include "udpfw.fullname" . )) }}
 - name: UDPFW_DISPATCH_REDIS_PUBSUB_CHANNEL
   value: {{ .Values.dispatch.redis.channel | default "udpfw-dispatch-exchange" }}
