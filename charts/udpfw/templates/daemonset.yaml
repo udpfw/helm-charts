@@ -36,52 +36,57 @@ spec:
       {{- with .Values.daemonset.pod.useHostNetwork }}
       hostNetwork: true
       {{- end }}
+      {{- with .Values.daemonset.pod.dnsPolicy }}
+      dnsPolicy: {{ . | quote }}
+      {{- end }}
       {{- if or .Values.daemonset.pod.priorityClassCreate .Values.daemonset.pod.priorityClassName }}
       priorityClassName: {{ .Values.daemonset.pod.priorityClassName | default (include "udpfw.fullname" . ) }}
       {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.udpfw.image.repository }}:{{ .Values.udpfw.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.udpfw.image.pullPolicy }}
-          {{- with .Values.udpfw.securityContext }}
+        - name: {{ .Chart.Name }}-dispatch
+          image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag | default .Chart.AppVersion }}"
+          command:
+            - /opt/udpfw/dispatch
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          {{- with .Values.dispatch.securityContext }}
           securityContext: {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - containerPort: {{ .Values.udpfw.defaultPort }}
+            - containerPort: {{ .Values.dispatch.defaultPort }}
               name: udpfw
               protocol: TCP
-          {{- if .Values.udpfw.ports }}
-          {{- .Values.udpfw.ports | toYaml | nindent 12 }}
+          {{- if .Values.dispatch.ports }}
+          {{- .Values.dispatch.ports | toYaml | nindent 12 }}
           {{- end }}
-          {{- with .Values.udpfw.livenessProbe }}
+          {{- with .Values.dispatch.livenessProbe }}
           livenessProbe: {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.udpfw.readinessProbe }}
+          {{- with .Values.dispatch.readinessProbe }}
           readinessProbe: {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.udpfw.resources }}
+          {{- with .Values.dispatch.resources }}
           resources: {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.udpfw.envFrom }}
+          {{- with .Values.dispatch.envFrom }}
           envFrom: {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
-            {{- with .Values.udpfw.env }}
+            {{- with .Values.dispatch.env }}
               {{- toYaml . | nindent 10 }}
             {{- end }}
-            {{- if .Values.udpfw.envDict }}
+            {{- if .Values.dispatch.envDict }}
             {{- range $key, $value := .Values.udpfw.envDict }}
             - name: {{ quote $key }}
               value: {{ quote $value }}
             {{- end }}
             {{- end }}
             - name: UDPFW_DISPATCH_BIND
-              value: {{ include "udpfw.bind" . | quote }}
-            {{- if .Values.udpfw.enableDebugLog }}
+              value: {{ include "dispatch.bind" . | quote }}
+            {{- if .Values.dispatch.enableDebugLog }}
             - name: UDPFW_DISPATCH_DEBUG
               value: "true"
             {{- end }}
-            {{ include "udpfw.pubsub-envs" . | nindent 12 }}
+            {{ include "dispatch.pubsub-envs" . | nindent 12 }}
       {{- with .Values.daemonset.pod.tolerations }}
       tolerations: {{ toYaml .| nindent 8 }}
       {{- end }}

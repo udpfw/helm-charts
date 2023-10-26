@@ -6,44 +6,44 @@ fullnameOverride:  # ""
 
 ## global -- Globally shared configuration
 global:
-  # -- Common labels for the all resources
+  # global.additionalLabels -- Common labels for the all resources
   additionalLabels: {}
   # app: udpfw
 
-## upfw -- Udpfw container configuration
-udpfw:
-
-  # udpfw.defaultPort -- Default port to listen TCP packets
-  defaultPort: 2727
-
-  # udpfw.bindIPV6 -- If the server must bind IPV6 or IPV4 (defaults to IPV4)
-  bindIPV6: false
-
-  ## Define the image to work with
+  # global.image -- Define the image to work with
   image:
-    # udpfw.image.repository -- Repository to use
-    repository: ghcr.io/udpfw/dispatch
+    # global.image.repository -- Repository to use
+    repository: ghcr.io/udpfw/udpfw
 
-    # udpfw.image.tag -- Overrides the global Helm image tag whose default is the chart appVersion
+    # global.image.tag -- Overrides the global Helm image tag whose default is the chart appVersion
     tag: ""
 
-    # udpfw.image.pullPolicy -- Image pullPolicy
+    # global.image.pullPolicy -- Image pullPolicy
     pullPolicy: IfNotPresent
 
-  # udpfw.enableDebugLog -- Enable log in debug level
+## dispatch -- Dispatch container configuration
+dispatch:
+
+  # dispatch.defaultPort -- Default port to listen TCP packets
+  defaultPort: 2727
+
+  # dispatch.bindIPV6 -- If the server must bind IPV6 or IPV4 (defaults to IPV4)
+  bindIPV6: false
+
+  # dispatch.enableDebugLog -- Enable log in debug level
   enableDebugLog: false
 
-  # udpfw.securityContext -- Allows you to overwrite the default PodSecurityContext on the udpfw container
+  # dispatch.securityContext -- Allows you to overwrite the default PodSecurityContext on the dispatch container
   securityContext:
     capabilities:
       add:
         - NET_ADMIN
     privileged: true
 
-  # udpfw.ports -- Allows to specify extra ports (hostPorts for instance) for this container
+  # dispatch.ports -- Allows to specify extra ports (hostPorts for instance) for this container
   ports: []
 
-  # udpfw.resources -- Resource requests and limits for the this container.
+  # dispatch.resources -- Resource requests and limits for the this container.
   resources: {}
   #  requests:
   #    cpu: 200m
@@ -52,51 +52,51 @@ udpfw:
   #    cpu: 200m
   #    memory: 256Mi
 
-  # udpfw.livenessProbe -- Add liveness probe settings
+  # dispatch.livenessProbe -- Add liveness probe settings
   # @default -- Every 15s / 6 KO / 1 OK
   livenessProbe: {}
 
-  # udpfw.readinessProbe -- Add readiness probe settings
+  # dispatch.readinessProbe -- Add readiness probe settings
   readinessProbe: {}
 
-  # udpfw.env -- Additional environment variables for this container
+  # dispatch.env -- Additional environment variables for this container
   env: []
 
-  # udpfw.envFrom -- Set environment variables specific to container from configMaps and/or secrets
+  # dispatch.envFrom -- Set environment variables specific to container from configMaps and/or secrets
   envFrom: []
   #   - configMapRef:
   #       name: <CONFIGMAP_NAME>
   #   - secretRef:
   #       name: <SECRET_NAME>
 
-  # udpfw.envDict -- Set environment variables specific to this container defined in a dict
+  # dispatch.envDict -- Set environment variables specific to this container defined in a dict
   envDict: {}
   #   <ENV_VAR_NAME>: <ENV_VAR_VALUE>
 
-  # udpfw.nats -- NATS PubSub Server configuration
+  # dispatch.nats -- NATS PubSub Server configuration
   nats:
-    # udpfw.nats.url -- URL for a NATS server (when using NATS for pubsub)
+    # dispatch.nats.url -- URL for a NATS server (when using NATS for pubsub)
     url: ""
-    # udpfw.nats.subscriptionSubject -- Name of a NATS subscription subject where data will be exchanged
-    subscriptionSubject: "udpfw-dispatch-exchange"
-    # udpfw.nats.userCredentials -- NATS user's JWT path
+    # dispatch.nats.subscriptionSubject -- Name of a NATS subscription subject where data will be exchanged
+    subscriptionSubject: "dispatch-dispatch-exchange"
+    # dispatch.nats.userCredentials -- NATS user's JWT path
     userCredentials: ""
-    # udpfw.nats.userCredentialsNkey -- NATS user's private Nkey seed path
+    # dispatch.nats.userCredentialsNkey -- NATS user's private Nkey seed path
     userCredentialsNkey: ""
-    # udpfw.nats.nkeyFromSeed -- NATS user's bare nkey seed path
+    # dispatch.nats.nkeyFromSeed -- NATS user's bare nkey seed path
     nkeyFromSeed: ""
-    # udpfw.nats.rootCA -- Path to Root CA for a self-signed TLS certificate
+    # dispatch.nats.rootCA -- Path to Root CA for a self-signed TLS certificate
     rootCA: ""
-    # udpfw.nats.clientCertificate -- NATS client certificate path
+    # dispatch.nats.clientCertificate -- NATS client certificate path
     clientCertificate: ""
-    # udpfw.nats.clientKey -- NATS client certificate key path
+    # dispatch.nats.clientKey -- NATS client certificate key path
     clientKey: ""
 
-  # udpfw.redis -- Redis PubSub Server configuration
+  # dispatch.redis -- Redis PubSub Server configuration
   redis:
-    # udpfw.redis.url -- Redis URL (when using Redis for pubsub)
+    # dispatch.redis.url -- Redis URL (when using Redis for pubsub)
     url: ""
-    # udpfw.redis.channel -- Redis channel name where data will be exchanged
+    # dispatch.redis.channel -- Redis channel name where data will be exchanged
     channel: "udpfw-dispatch-exchange"
 
 # daemonset -- Daemonset configuration
@@ -131,6 +131,11 @@ daemonset:
     ## WARNING: Make sure that hosts using this are properly firewalled otherwise
     ## metrics and traces are accepted from any host able to connect to this host.
     useHostNetwork: false
+
+    # daemonset.pod.dnsPolicy -- Pod's DNS policy
+
+    ## See https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+    dnsPolicy: "ClusterFirst"
 
     # daemonset.pod.imagePullSecrets -- Repository pullSecret (ex: specify docker registry credentials)
 
