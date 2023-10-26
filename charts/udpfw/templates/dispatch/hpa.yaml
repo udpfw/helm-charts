@@ -1,0 +1,44 @@
+{{- if and .Values.dispatch.enabled .Values.dispatch.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "udpfw.fullname" . }}-dispatch
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "udpfw.labels" . | nindent 4 }}
+    app.kubernetes.io/name: dispatch
+    {{- with .Values.dispatch.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "udpfw.fullname" . }}-dispatch
+  minReplicas: {{ .Values.dispatch.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.dispatch.autoscaling.maxReplicas }}
+  metrics:
+  {{- with .Values.dispatch.autoscaling.metrics }}
+    {{- toYaml . | nindent 4 }}
+  {{- else }}
+    {{- with .Values.dispatch.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ . }}
+    {{- end }}
+    {{- with .Values.dispatch.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ . }}
+    {{- end }}
+  {{- end }}
+  {{- with .Values.dispatch.autoscaling.behavior }}
+  behavior:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
