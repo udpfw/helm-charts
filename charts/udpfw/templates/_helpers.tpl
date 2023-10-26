@@ -36,7 +36,7 @@ Common labels
 {{- define "udpfw.labels" -}}
 helm.sh/chart: {{ include "udpfw.chart" . }}
 {{ include "udpfw.selectorLabels" . }}
-app.kubernetes.io/version: {{ .Values.udpfw.image.tag | default .Chart.AppVersion | quote }}
+app.kubernetes.io/version: {{ .Values.global.image.tag | default .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: udpfw
 {{- with .Values.global.additionalLabels }}
@@ -55,11 +55,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "udpfw.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "udpfw.fullname" .) .Values.serviceAccount.name }}
+{{- define "udpfw.dispatch.serviceAccountName" -}}
+{{- if .Values.dispatch.serviceAccount.create }}
+{{- default (include "udpfw.fullname" .) .Values.dispatch.serviceAccount.name }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- default "default" .Values.dispatch.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
@@ -67,9 +67,9 @@ Create the name of the service account to use
 {{/*
 Bind address the server will listen on
 */}}
-{{- define "udpfw.bind" -}}
-    {{ $defaultPort := (.Values.udpfw.defaultPort | int) }}
-    {{- if .Values.udpfw.bindIPV6 }}
+{{- define "udpfw.dispatch.bind" -}}
+    {{ $defaultPort := (.Values.dispatch.container.defaultPort | int) }}
+    {{- if .Values.dispatch.container.bindIPV6 }}
         {{- printf "[::]:%d" $defaultPort }}
     {{- else}}
         {{- printf ":%d" $defaultPort }}
@@ -77,61 +77,61 @@ Bind address the server will listen on
 {{- end -}}
 
 {{/*
-PubSub environment variables
+Dispatch PubSub environment variables
 */}}
-{{- define "udpfw.pubsub-envs" -}}
-    {{- if or (and .Values.nats.enabled .Values.redis.enabled) (and .Values.udpfw.nats.url .Values.udpfw.redis.url)}}
-        {{- fail "define either NATS or Redis URL, not both." }}
+{{- define "udpfw.dispatch.pubsub-envs" -}}
+    {{- if or (and .Values.nats.enabled .Values.redis.enabled) (and .Values.dispatch.container.nats.url .Values.dispatch.container.redis.url)}}
+        {{- fail "dispatch: define either NATS or Redis URL, not both." }}
     {{- end }}
-    {{- if (or .Values.udpfw.nats.url .Values.nats.enabled) }}
-        {{- include "udpfw.pubsub-envs.nats" . }}
-    {{- else if (or .Values.udpfw.redis.url .Values.redis.enabled) }}
-        {{- include "udpfw.pubsub-envs.redis" . }}
+    {{- if (or .Values.dispatch.container.nats.url .Values.nats.enabled) }}
+        {{- include "udpfw.dispatch.pubsub-envs.nats" . }}
+    {{- else if (or .Values.dispatch.container.redis.url .Values.redis.enabled) }}
+        {{- include "udpfw.dispatch.pubsub-envs.redis" . }}
     {{- else }}
-        {{- fail "define either NATS or Redis URL." }}
+        {{- fail "dispatch: define either NATS or Redis URL." }}
     {{- end }}
 {{- end -}}
 
 {{/*
-PubSub NATS environment variables
+Dispatch PubSub NATS environment variables
 */}}
-{{- define "udpfw.pubsub-envs.nats" -}}
+{{- define "udpfw.dispatch.pubsub-envs.nats" -}}
 - name: UDPFW_DISPATCH_NATS_URL
-  value: {{ .Values.udpfw.nats.url | default (printf "%s-nats:4222" (include "udpfw.fullname" . )) }}
+  value: {{ .Values.dispatch.container.nats.url | default (printf "%s-nats:4222" (include "udpfw.fullname" . )) }}
 - name: UDPFW_DISPATCH_NATS_SUBSCRIPTION_SUBJECT
-  value: {{ .Values.udpfw.nats.subscriptionSubject | default "udpfw-dispatch-exchange" }}
-{{- with .Values.udpfw.nats.userCredentials }}
+  value: {{ .Values.dispatch.container.nats.subscriptionSubject | default "udpfw-dispatch-exchange" }}
+{{- with .Values.dispatch.container.nats.userCredentials }}
 - name: UDPFW_DISPATCH_NATS_USER_CREDENTIALS_PATH
   value: {{ . | quote }}
 {{- end }}
-{{- with .Values.udpfw.nats.userCredentialsNkey }}
+{{- with .Values.dispatch.container.nats.userCredentialsNkey }}
 - name: UDPFW_DISPATCH_NATS_USER_CREDENTIALS_NKEY_PATH
   value: {{ . | quote }}
 {{- end }}
-{{- with .Values.udpfw.nats.nkeyFromSeed }}
+{{- with .Values.dispatch.container.nats.nkeyFromSeed }}
 - name: UDPFW_DISPATCH_NATS_NKEY_SEED_PATH
   value: {{ . | quote }}
 {{- end }}
-{{- with .Values.udpfw.nats.rootCA }}
+{{- with .Values.dispatch.container.nats.rootCA }}
 - name: UDPFW_DISPATCH_NATS_ROOT_CA_PATH
   value: {{ . | quote }}
 {{- end }}
-{{- with .Values.udpfw.nats.clientCertificate }}
+{{- with .Values.dispatch.container.nats.clientCertificate }}
 - name: UDPFW_DISPATCH_NATS_CLIENT_CERTIFICATE_PATH
   value: {{ . | quote }}
 {{- end }}
-{{- with .Values.udpfw.nats.clientKey }}
+{{- with .Values.dispatch.container.nats.clientKey }}
 - name: UDPFW_DISPATCH_NATS_CLIENT_CERTIFICATE_KEY_PATH
   value: {{ . | quote }}
 {{- end }}
 {{- end -}}
 
 {{/*
-PubSub Redis environment variables
+Dispatch PubSub Redis environment variables
 */}}
-{{- define "udpfw.pubsub-envs.redis" -}}
-- name: UDPFW_DISPATCH_REDIS_PATH
-  value: {{ .Values.udpfw.redis.url | default (printf "redis://%s-redis-master:6379/0" (include "udpfw.fullname" . )) }}
+{{- define "udpfw.dispatch.pubsub-envs.redis" -}}
+- name: UDPFW_DISPATCH_REDIS_URL
+  value: {{ .Values.dispatch.container.redis.url | default (printf "redis://%s-redis-master:6379/0" (include "udpfw.fullname" . )) }}
 - name: UDPFW_DISPATCH_REDIS_PUBSUB_CHANNEL
-  value: {{ .Values.udpfw.redis.channel | default "udpfw-dispatch-exchange" }}
+  value: {{ .Values.dispatch.container.redis.channel | default "udpfw-dispatch-exchange" }}
 {{- end -}}
