@@ -1,3 +1,4 @@
+{{- if .Values.nodelet.enabled -}}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -39,6 +40,9 @@ spec:
       {{- with .Values.nodelet.pod.useHostNetwork }}
       hostNetwork: true
       {{- end }}
+      {{- with .Values.nodelet.pod.dnsPolicy }}
+      dnsPolicy: {{ . | quote }}
+      {{- end }}
       {{- if or .Values.nodelet.pod.priorityClassCreate .Values.nodelet.pod.priorityClassName }}
       priorityClassName: {{ .Values.nodelet.pod.priorityClassName | default (printf "%s-nodelet" (include "udpfw.fullname" . )) }}
       {{- end }}
@@ -76,7 +80,7 @@ spec:
             - name: UDPFW_NODELET_IFACE
               value: {{ .Values.nodelet.container.iface | quote }}
             - name: UDPFW_DISPATCH_ADDRESS
-              value: {{ default (printf "%s-dispatch.svc.cluster.local" (include "udpfw.fullname" . )) .Values.nodelet.container.dispatchAddress | quote }}
+              value: {{ default (printf "%s-dispatch:2727" (include "udpfw.fullname" . )) .Values.nodelet.container.dispatchAddress | quote }}
             {{- if .Values.nodelet.container.enableDebugLog }}
             - name: UDPFW_NODELET_DEBUG
               value: "true"
@@ -91,3 +95,5 @@ spec:
       nodeSelector: {{ toYaml .| nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "udpfw.nodelet.serviceAccountName" . }}
+
+{{- end }}

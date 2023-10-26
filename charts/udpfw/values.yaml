@@ -244,7 +244,7 @@ nodelet:
   container:
 
     # nodelet.container.iface -- The interface name from which UDP packets will be captured
-    iface: ""
+    iface: "eth0"
 
     # nodelet.container.dispatchAddress -- "IP and port to the Dispatch service running on the local cluster"
     dispatchAddress: ""
