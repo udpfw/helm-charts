@@ -40,7 +40,7 @@ spec:
       hostNetwork: true
       {{- end }}
       {{- if or .Values.nodelet.pod.priorityClassCreate .Values.nodelet.pod.priorityClassName }}
-      priorityClassName: {{ .Values.nodelet.pod.priorityClassName | default (include "udpfw.fullname" . ) }}
+      priorityClassName: {{ .Values.nodelet.pod.priorityClassName | default (printf "%s-nodelet" (include "udpfw.fullname" . )) }}
       {{- end }}
       containers:
         - name: nodelet

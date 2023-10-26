@@ -410,3 +410,5 @@ nats:
   config:
     cluster:
       enabled: true
+  natsBox:
+    enabled: false
