@@ -1,0 +1,294 @@
+# nameOverride -- Override name of app
+nameOverride:  # ""
+
+# fullnameOverride -- Override the full qualified app name
+fullnameOverride:  # ""
+
+## global -- Globally shared configuration
+global:
+  # global.additionalLabels -- Common labels for the all resources
+  additionalLabels: {}
+  # app: udpfw-dispatch
+
+## dispatch -- Dispatch configuration
+dispatch:
+
+  ## dispatch.image -- Define the image to work with
+  image:
+    # dispatch.image.repository -- Repository to use
+    repository: ghcr.io/udpfw/udpfw
+
+    # dispatch.image.tag -- Overrides the global Helm image tag whose default is the chart appVersion
+    tag: ""
+
+    # dispatch.image.pullPolicy -- Image pullPolicy
+    pullPolicy: IfNotPresent
+
+
+  # dispatch.daemonset -- Dispatch as daemonset configuration
+  daemonset:
+    # dispatch.daemonset.enabled -- Enable/Disable daemonset configuration (if disabled, it will use deployment config)
+    enabled: true
+
+    # dispatch.daemonset.priorityClassCreate -- Creates a priorityClass for the Daemonset pods.
+    priorityClassCreate: true
+
+    # dispatch.daemonset.priorityClassName -- Sets PriorityClassName if defined
+    priorityClassName:
+
+    # dispatch.daemonset.priorityPreemptionPolicyValue -- Set to "Never" to change the PriorityClass to non-preempting
+    priorityPreemptionPolicyValue: PreemptLowerPriority
+
+    # dispatch.daemonset.pod.priorityClassValue -- Value used to specify the priority of the scheduling of Daemonset pods.
+
+    ## The PriorityClass uses PreemptLowerPriority.
+    priorityClassValue: 1000000000
+
+  deployment:
+    # dispatch.deployment.replicas -- How many replicas should be deployed
+    replicas: 3
+
+    # dispatch.deployment.autoscaling -- Dispatch Horizontal Pod Autoscaler
+    autoscaling:
+      # dispatch.deployment.autoscaling.enabled -- Enable Horizontal Pod Autoscaler ([HPA])
+      enabled: false
+      # dispatch.deployment.autoscaling.minReplicas -- Minimum number of replicas for the Dispatch [HPA]
+      minReplicas: 1
+      # dispatch.deployment.autoscaling.maxReplicas -- Maximum number of replicas for the Dispatch [HPA]
+      maxReplicas: 5
+      # dispatch.deployment.autoscaling.targetCPUUtilizationPercentage -- Average CPU utilization percentage for the Dispatch [HPA]
+      targetCPUUtilizationPercentage: 50
+      # dispatch.deployment.autoscaling.targetMemoryUtilizationPercentage -- Average memory utilization percentage for the Dispatch [HPA]
+      targetMemoryUtilizationPercentage: 50
+      # dispatch.deployment.autoscaling.behavior -- Configures the scaling behavior of the target in both Up and Down directions.
+      behavior: { }
+        # scaleDown:
+        #  stabilizationWindowSeconds: 300
+        #  policies:
+        #   - type: Pods
+        #     value: 1
+        #     periodSeconds: 180
+        # scaleUp:
+        #   stabilizationWindowSeconds: 300
+        #   policies:
+        #   - type: Pods
+      #     value: 2
+      #     periodSeconds: 60
+
+      # dispatch.deployment.autoscaling.metrics -- Configures custom HPA metrics for the Dispatch
+      # Ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+      metrics: []
+
+  # dispatch.service -- Dispatch service configuration
+  service:
+    # dispatch.service.enabled -- Enable/Disable Dispatch service
+    enabled: true
+
+    # dispatch.service.additionalLabels -- Add extra labels to the service
+    additionalLabels: {}
+
+    # dispatch.service.type -- Service Type
+    type: ClusterIP
+
+    # dispatch.service.clusterIP -- Service clusterIP. `None` makes a "headless service" (no virtual IP)
+    clusterIP: ""
+
+    # dispatch.service.defaultPort --
+    defaultPort: 2727
+
+    # dispatch.service.ports -- Service Extra Ports
+    ports: []
+
+  # dispatch.annotations -- Adds annotations to the deployment
+  annotations: {}
+  # dispatch.labels -- Adds labels to the deployment
+  labels: {}
+  # dispatch.revisionHistoryLimit -- The number of ControllerRevision to keep in this Deployment.
+  revisionHistoryLimit: 1
+
+  # dispatch.updateStrategy -- Allow the Deployment to perform a rolling update on helm update
+
+  ## ref: https://kubernetes.io/docs/tasks/manage-daemon/update-daemon-set/
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: "10%"
+
+  container:
+    # dispatch.container.defaultPort -- Default port to listen TCP packets
+    defaultPort: 2727
+
+    # dispatch.container.bindIPV6 -- If the server must bind IPV6 or IPV4 (defaults to IPV4)
+    bindIPV6: false
+
+    # dispatch.container.enableDebugLog -- Enable log in debug level
+    enableDebugLog: false
+
+    # dispatch.container.securityContext -- Allows you to overwrite the default PodSecurityContext
+    securityContext:
+    #  capabilities:
+    #    add:
+    #      - NET_ADMIN
+    #  privileged: true
+
+    # dispatch.container.ports -- Allows to specify extra ports (hostPorts for instance) for this container
+    ports: []
+
+    # dispatch.container.resources -- Resource requests and limits for this container.
+    resources: {}
+    #  requests:
+    #    cpu: 200m
+    #    memory: 256Mi
+    #  limits:
+    #    cpu: 200m
+    #    memory: 256Mi
+
+    # dispatch.container.livenessProbe -- Add liveness probe settings
+    # @default -- Every 15s / 6 KO / 1 OK
+    livenessProbe: {}
+
+    # dispatch.container.readinessProbe -- Add readiness probe settings
+    readinessProbe: {}
+
+    # dispatch.container.env -- Additional environment variables for this container
+    env: []
+
+    # dispatch.container.envFrom -- Set environment variables specific to container from configMaps and/or secrets
+    envFrom: []
+    #   - configMapRef:
+    #       name: <CONFIGMAP_NAME>
+    #   - secretRef:
+    #       name: <SECRET_NAME>
+
+    # dispatch.container.envDict -- Set environment variables specific to this container defined in a dict
+    envDict: {}
+    #   <ENV_VAR_NAME>: <ENV_VAR_VALUE>
+
+    # dispatch.container.nats -- NATS PubSub Server configuration
+    nats:
+      # udpfw.nats.url -- URL for a NATS server (when using NATS for pubsub)
+      url: ""
+      # udpfw.nats.subscriptionSubject -- Name of a NATS subscription subject where data will be exchanged
+      subscriptionSubject: "udpfw-dispatch-exchange"
+      # udpfw.nats.userCredentials -- NATS user's JWT path
+      userCredentials: ""
+      # udpfw.nats.userCredentialsNkey -- NATS user's private Nkey seed path
+      userCredentialsNkey: ""
+      # udpfw.nats.nkeyFromSeed -- NATS user's bare nkey seed path
+      nkeyFromSeed: ""
+      # udpfw.nats.rootCA -- Path to Root CA for a self-signed TLS certificate
+      rootCA: ""
+      # udpfw.nats.clientCertificate -- NATS client certificate path
+      clientCertificate: ""
+      # udpfw.nats.clientKey -- NATS client certificate key path
+      clientKey: ""
+
+    # dispatch.container.redis -- Redis PubSub Server configuration
+    redis:
+      # udpfw.redis.url -- Redis URL (when using Redis for pubsub)
+      url: ""
+      # udpfw.redis.channel -- Redis channel name where data will be exchanged
+      channel: "udpfw-dispatch-exchange"
+
+  pod:
+    # dispatch.pod.annotations -- Adds annotations to the deployment pod
+    annotations: {}
+    # dispatch.pod.labels -- Adds labels to the deployment pod
+    labels: {}
+
+    # dispatch.pod.useHostNetwork -- Bind ports on the hostNetwork
+
+    ## Useful for CNI networking where hostPort might
+    ## not be supported. The ports need to be available on all hosts. It Can be
+    ## used for custom metrics instead of a service endpoint.
+    ##
+    ## WARNING: Make sure that hosts using this are properly firewalled otherwise
+    ## metrics and traces are accepted from any host able to connect to this host.
+    useHostNetwork: false
+
+    # dispatch.pod.dnsPolicy -- Pod's DNS policy
+
+    ## See https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+    dnsPolicy: "ClusterFirst"
+
+    # dispatch.pod.imagePullSecrets -- Repository pullSecret (ex: specify docker registry credentials)
+
+    ## See https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
+    imagePullSecrets: []
+    #   - name: "<REG_SECRET>"
+
+    # dispatch.pod.tolerations -- Allow the Deployment to schedule on tainted nodes (requires Kubernetes >= 1.6)
+    tolerations: []
+
+    # dispatch.pod.nodeSelector -- Allow the Deployment to schedule on selected nodes
+
+    ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+    nodeSelector: {}
+
+    # dispatch.pod.topologySpreadConstraints -- Allow  to instruct the kube-scheduler how to place each incoming Pod in relation to the existing Pods across your cluster.
+
+    ## Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+    topologySpreadConstraints: []
+
+    # dispatch.pod.affinity -- Allow the Deployment to schedule using affinity rules
+
+    ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+    affinity: {}
+
+  # dispatch.serviceAccount -- Service Account configuration
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # Labels to add to the service account
+    labels: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+## redis -- When `redis.enabled=true` deploys a redis master/replica using Redis Bitnami's subchart
+# Ref: https://github.com/bitnami/charts/blob/main/bitnami/redis/values.yaml
+redis:
+  # -- Enables the Redis subchart
+  enabled: false
+  cluster:
+    init: false
+    auth:
+      enabled: false
+    persistence:
+      enabled: false
+    master:
+      extraFlags:
+        - --maxmemory-policy volatile-ttl
+        - --repl-backlog-size 384mb
+        - --loglevel warning
+      resources:
+        requests:
+          memory: 256m
+          cpu: 100m
+    sysctl:
+      enabled: true
+      mountHostSys: true
+      resources:
+        requests:
+          memory: 64Mi
+          cpu: 10m
+      command:
+        - /bin/sh
+        - -c
+        - |-
+          install_packages procps
+          sysctl -w net.core.somaxconn=10000
+          echo never > /host-sys/kernel/mm/transparent_hugepage/enabled
+
+## nats -- When `nats.enabled=true` deploys a nats cluster using Nats's subchart
+# Ref: https://github.com/nats-io/k8s/blob/main/helm/charts/nats/values.yaml
+nats:
+  # -- Enables the Nats subchart
+  enabled: true
+  config:
+    cluster:
+      enabled: true
+  natsBox:
+    enabled: false

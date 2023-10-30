@@ -1,0 +1,31 @@
+{{- if .Values.dispatch.service.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "udpfw.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- with .Values.dispatch.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels: {{- include "udpfw.labels" . | nindent 4 }}
+    {{- with .Values.dispatch.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.dispatch.service.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.dispatch.service.type }}
+  {{- if .Values.dispatch.service.clusterIP }}
+  clusterIP: {{ .Values.dispatch.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: "dispatch"
+      protocol: TCP
+      targetPort: dispatch
+      port: {{ .Values.dispatch.service.defaultPort }}
+    {{- with .Values.dispatch.service.ports }}
+      {{- toYaml . | nindent 4}}
+    {{- end }}
+  selector: {{- include "udpfw.selectorLabels" . | nindent 4 }}
+{{- end }}

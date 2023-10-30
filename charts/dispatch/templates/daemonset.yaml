@@ -1,0 +1,102 @@
+{{- if .Values.dispatch.daemonset.enabled -}}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "udpfw.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- with .Values.dispatch.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels: {{- include "udpfw.labels" . | nindent 4 }}
+    {{- with .Values.dispatch.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  revisionHistoryLimit: {{ .Values.dispatch.revisionHistoryLimit }}
+  updateStrategy: {{- toYaml .Values.dispatch.updateStrategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "udpfw.selectorLabels" . | nindent 6 }}
+      {{- with .Values.dispatch.pod.labels }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "udpfw.selectorLabels" . | nindent 8 }}
+        {{- with .Values.dispatch.pod.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.dispatch.pod.annotations }}
+      annotations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.dispatch.pod.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dispatch.pod.useHostNetwork }}
+      hostNetwork: true
+      {{- end }}
+      {{- with .Values.dispatch.pod.dnsPolicy }}
+      dnsPolicy: {{ . | quote }}
+      {{- end }}
+      {{- if or .Values.dispatch.daemonset.priorityClassCreate .Values.dispatch.daemonset.priorityClassName }}
+      priorityClassName: {{ .Values.dispatch.daemonset.priorityClassName | default (include "udpfw.fullname" . ) }}
+      {{- end }}
+      containers:
+        - name: dispatch
+          image: "{{ .Values.dispatch.image.repository }}:{{ .Values.dispatch.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.dispatch.image.pullPolicy }}
+          {{- with .Values.dispatch.container.securityContext }}
+          securityContext: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command:
+            - /opt/udpfw/dispatch
+          ports:
+            - containerPort: {{ .Values.dispatch.container.defaultPort }}
+              name: dispatch
+              protocol: TCP
+          {{- if .Values.dispatch.container.ports }}
+          {{- .Values.dispatch.container.ports | toYaml | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dispatch.container.livenessProbe }}
+          livenessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dispatch.container.readinessProbe }}
+          readinessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dispatch.container.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.dispatch.container.envFrom }}
+          envFrom: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- with .Values.dispatch.container.env }}
+              {{- toYaml . | nindent 10 }}
+            {{- end }}
+            {{- if .Values.dispatch.container.envDict }}
+            {{- range $key, $value := .Values.dispatch.container.envDict }}
+            - name: {{ quote $key }}
+              value: {{ quote $value }}
+            {{- end }}
+            {{- end }}
+            - name: UDPFW_DISPATCH_BIND
+              value: {{ include "udpfw.dispatch.bind" . | quote }}
+            {{- if .Values.dispatch.container.enableDebugLog }}
+            - name: UDPFW_DISPATCH_DEBUG
+              value: "true"
+            {{- end }}
+            {{ include "udpfw.dispatch.pubsub-envs" . | nindent 12 }}
+      {{- with .Values.dispatch.pod.tolerations }}
+      tolerations: {{ toYaml .| nindent 8 }}
+      {{- end }}
+      {{- with .Values.dispatch.pod.affinity }}
+      affinity: {{ toYaml .| nindent 8 }}
+      {{- end }}
+      {{- with .Values.dispatch.pod.nodeSelector }}
+      nodeSelector: {{ toYaml .| nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "udpfw.dispatch.serviceAccountName" . }}
+
+{{- end }}
