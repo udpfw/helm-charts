@@ -103,7 +103,7 @@ nodelet:
     enableDebugLog: false
 
     # nodelet.container.namespace -- Namespace to listen to
-    namespace: "global"
+    namespace: ""
 
     # nodelet.container.lifecycle -- Allows you to configure a lifecycle policy
     lifecycle:

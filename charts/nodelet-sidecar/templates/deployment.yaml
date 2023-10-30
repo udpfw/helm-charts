@@ -86,8 +86,10 @@ spec:
             - name: UDPFW_DISPATCH_ADDRESS
               value: {{ .Values.nodelet.container.dispatchAddress | quote }}
             {{- end }}
+            {{- if .Values.nodelet.container.namespace }}
             - name: UDPFW_NODELET_NAMESPACE
-              value: {{ default "global" .Values.nodelet.container.namespace | quote }}
+              value: {{ .Values.nodelet.container.namespace | quote }}
+            {{- end }}
             {{- if .Values.nodelet.container.enableDebugLog }}
             - name: UDPFW_NODELET_DEBUG
               value: "true"
@@ -104,19 +106,7 @@ spec:
       {{- with .Values.nodelet.pod.nodeSelector }}
       nodeSelector: {{ toYaml .| nindent 8 }}
       {{- end }}
-      {{- if .Values.nodelet.pod.topologySpreadConstraints }}
-      topologySpreadConstraints: {{ .Values.nodelet.pod.topologySpreadConstraints | toYaml | nindent 8 }}
-      {{- else }}
-      topologySpreadConstraints:
-        - labelSelector:
-            matchLabels: {{- include "udpfw.nodelet-sidecar.selectorLabels" . | nindent 12 }}
-          maxSkew: 1
-          topologyKey: topology.kubernetes.io/zone
-          whenUnsatisfiable: DoNotSchedule
-        - labelSelector:
-            matchLabels: {{- include "udpfw.nodelet-sidecar.selectorLabels" . | nindent 12 }}
-          maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
+      {{- with .Values.nodelet.pod.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ toYaml .| nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "udpfw.nodelet-sidecar.serviceAccountName" . }}
