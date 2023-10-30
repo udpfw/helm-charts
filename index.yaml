@@ -3,6 +3,32 @@ entries:
   udpfw-dispatch:
   - apiVersion: v2
     appVersion: v0.1-alpha6
+    created: "2023-10-30T12:27:48.784361925Z"
+    dependencies:
+    - condition: nats.enabled
+      name: nats
+      repository: https://nats-io.github.io/k8s/helm/charts
+      version: 1.1.2
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 18.1.6
+    description: A Helm chart for udpfw-dispatch
+    digest: 60dca6f407ddfff901767f3c19087831994d79b4bdcc0fa368cdb51f4689a933
+    maintainers:
+    - email: hey@vito.io
+      name: Vito Sartori
+    - email: thalescostaa@gmail.com
+      name: Thales Costa
+    name: udpfw-dispatch
+    sources:
+    - https://github.com/udpfw/udpfw
+    type: application
+    urls:
+    - https://github.com/udpfw/helm-charts/releases/download/udpfw-dispatch-0.0.3/udpfw-dispatch-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
+    appVersion: v0.1-alpha6
     created: "2023-10-30T12:10:02.948924346Z"
     dependencies:
     - condition: nats.enabled
@@ -56,6 +82,23 @@ entries:
   udpfw-nodelet-sidecar:
   - apiVersion: v2
     appVersion: v0.1-alpha6
+    created: "2023-10-30T12:27:48.925667688Z"
+    description: A Helm chart for udpfw-nodelet being deployed as a sidecar
+    digest: a77057a690883027103b9944f2a13825088d227a06024429f6ca620a6f102014
+    maintainers:
+    - email: hey@vito.io
+      name: Vito Sartori
+    - email: thalescostaa@gmail.com
+      name: Thales Costa
+    name: udpfw-nodelet-sidecar
+    sources:
+    - https://github.com/udpfw/udpfw
+    type: application
+    urls:
+    - https://github.com/udpfw/helm-charts/releases/download/udpfw-nodelet-sidecar-0.0.3/udpfw-nodelet-sidecar-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
+    appVersion: v0.1-alpha6
     created: "2023-10-30T12:10:03.089066034Z"
     description: A Helm chart for udpfw-nodelet being deployed as a sidecar
     digest: 8df51e316ff8f7d7318d8c4a6fea7db5a570188bc7e74cb22aeb64d6eef2b7fe
@@ -88,4 +131,4 @@ entries:
     urls:
     - https://github.com/udpfw/helm-charts/releases/download/udpfw-nodelet-sidecar-0.0.1/udpfw-nodelet-sidecar-0.0.1.tgz
     version: 0.0.1
-generated: "2023-10-30T12:10:03.089081334Z"
+generated: "2023-10-30T12:27:48.925685488Z"
