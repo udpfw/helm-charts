@@ -82,6 +82,23 @@ entries:
   udpfw-nodelet-sidecar:
   - apiVersion: v2
     appVersion: v0.1-alpha6
+    created: "2023-10-30T15:27:48.165761217Z"
+    description: A Helm chart for udpfw-nodelet being deployed as a sidecar
+    digest: 5ee3321eb814de43c97f076016bf0d897634cc00f87240b02e05f720db255381
+    maintainers:
+    - email: hey@vito.io
+      name: Vito Sartori
+    - email: thalescostaa@gmail.com
+      name: Thales Costa
+    name: udpfw-nodelet-sidecar
+    sources:
+    - https://github.com/udpfw/udpfw
+    type: application
+    urls:
+    - https://github.com/udpfw/helm-charts/releases/download/udpfw-nodelet-sidecar-0.0.4/udpfw-nodelet-sidecar-0.0.4.tgz
+    version: 0.0.4
+  - apiVersion: v2
+    appVersion: v0.1-alpha6
     created: "2023-10-30T12:27:48.925667688Z"
     description: A Helm chart for udpfw-nodelet being deployed as a sidecar
     digest: a77057a690883027103b9944f2a13825088d227a06024429f6ca620a6f102014
@@ -131,4 +148,4 @@ entries:
     urls:
     - https://github.com/udpfw/helm-charts/releases/download/udpfw-nodelet-sidecar-0.0.1/udpfw-nodelet-sidecar-0.0.1.tgz
     version: 0.0.1
-generated: "2023-10-30T12:27:48.925685488Z"
+generated: "2023-10-30T15:27:48.165780518Z"
