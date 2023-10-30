@@ -88,8 +88,11 @@ spec:
               value: "true"
             {{- end }}
             {{ include "udpfw.dispatch.pubsub-envs" . | nindent 12 }}
-      {{- with .Values.dispatch.pod.tolerations }}
-      tolerations: {{ toYaml .| nindent 8 }}
+      tolerations:
+      {{- if .Values.dispatch.pod.tolerations }}
+       {{ .Values.dispatch.pod.tolerations | toYaml | nindent 8 }}
+      {{- else }}
+        - operator: Exists
       {{- end }}
       {{- with .Values.dispatch.pod.affinity }}
       affinity: {{ toYaml .| nindent 8 }}

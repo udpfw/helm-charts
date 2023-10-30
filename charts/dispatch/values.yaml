@@ -287,7 +287,6 @@ redis:
 nats:
   # -- Enables the Nats subchart
   enabled: true
-  nameOverride: "udpfw-dispatch-nats"
   config:
     cluster:
       enabled: true
