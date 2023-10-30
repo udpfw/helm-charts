@@ -1,0 +1,13 @@
+apiVersion: v2
+name: udpfw-nodelet-sidecar
+description: A Helm chart for udpfw-nodelet being deployed as a sidecar
+type: application
+version: 0.0.1
+appVersion: "v0.1-alpha6"
+sources:
+  - https://github.com/udpfw/udpfw
+maintainers:
+  - name: Vito Sartori
+    email: hey@vito.io
+  - name: Thales Costa
+    email: thalescostaa@gmail.com
