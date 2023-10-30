@@ -63,7 +63,7 @@ nodelet:
   # nodelet.service -- Nodelet service configuration
   service:
     # nodelet.service.enabled -- Enable/Disable Nodelet service
-    enabled: true
+    enabled: false
 
     # nodelet.service.additionalLabels -- Add extra labels to the service
     additionalLabels: {}

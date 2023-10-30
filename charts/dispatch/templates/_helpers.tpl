@@ -99,7 +99,7 @@ Dispatch PubSub NATS environment variables
 */}}
 {{- define "udpfw.dispatch.pubsub-envs.nats" -}}
 - name: UDPFW_DISPATCH_NATS_URL
-  value: {{ .Values.dispatch.container.nats.url | default (printf "%s-nats:4222" (include "udpfw.dispatch.fullname" . )) }}
+  value: {{ .Values.dispatch.container.nats.url | default "udpfw-dispatch-nats:4222"  }}
 - name: UDPFW_DISPATCH_NATS_SUBSCRIPTION_SUBJECT
   value: {{ .Values.dispatch.container.nats.subscriptionSubject | default "udpfw-dispatch-exchange" }}
 {{- with .Values.dispatch.container.nats.userCredentials }}
