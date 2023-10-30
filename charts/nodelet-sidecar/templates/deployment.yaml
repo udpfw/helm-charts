@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "udpfw.fullname" . }}
+  name: {{ include "udpfw.nodelet-sidecar.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   {{- with .Values.nodelet.annotations }}
   annotations: {{- toYaml . | nindent 4 }}
   {{- end }}
-  labels: {{- include "udpfw.labels" . | nindent 4 }}
+  labels: {{- include "udpfw.nodelet-sidecar.labels" . | nindent 4 }}
     {{- with .Values.nodelet.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -18,14 +18,14 @@ spec:
   strategy: {{- toYaml .Values.nodelet.updateStrategy | nindent 4 }}
   selector:
     matchLabels:
-      {{- include "udpfw.selectorLabels" . | nindent 6 }}
+      {{- include "udpfw.nodelet-sidecar.selectorLabels" . | nindent 6 }}
       {{- with .Values.nodelet.pod.labels }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
   template:
     metadata:
       labels:
-        {{- include "udpfw.selectorLabels" . | nindent 8 }}
+        {{- include "udpfw.nodelet-sidecar.selectorLabels" . | nindent 8 }}
         {{- with .Values.nodelet.pod.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -109,14 +109,14 @@ spec:
       {{- else }}
       topologySpreadConstraints:
         - labelSelector:
-            matchLabels: {{- include "udpfw.selectorLabels" . | nindent 12 }}
+            matchLabels: {{- include "udpfw.nodelet-sidecar.selectorLabels" . | nindent 12 }}
           maxSkew: 1
           topologyKey: topology.kubernetes.io/zone
           whenUnsatisfiable: DoNotSchedule
         - labelSelector:
-            matchLabels: {{- include "udpfw.selectorLabels" . | nindent 12 }}
+            matchLabels: {{- include "udpfw.nodelet-sidecar.selectorLabels" . | nindent 12 }}
           maxSkew: 1
           topologyKey: kubernetes.io/hostname
           whenUnsatisfiable: DoNotSchedule
       {{- end }}
-      serviceAccountName: {{ include "udpfw.nodelet.serviceAccountName" . }}
+      serviceAccountName: {{ include "udpfw.nodelet-sidecar.serviceAccountName" . }}

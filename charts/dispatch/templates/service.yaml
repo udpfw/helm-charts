@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "udpfw.fullname" . }}
+  name: {{ include "udpfw.dispatch.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   {{- with .Values.dispatch.annotations }}
   annotations: {{- toYaml . | nindent 4 }}
   {{- end }}
-  labels: {{- include "udpfw.labels" . | nindent 4 }}
+  labels: {{- include "udpfw.dispatch.labels" . | nindent 4 }}
     {{- with .Values.dispatch.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -27,5 +27,5 @@ spec:
     {{- with .Values.dispatch.service.ports }}
       {{- toYaml . | nindent 4}}
     {{- end }}
-  selector: {{- include "udpfw.selectorLabels" . | nindent 4 }}
+  selector: {{- include "udpfw.dispatch.selectorLabels" . | nindent 4 }}
 {{- end }}

@@ -3,7 +3,8 @@ apiVersion: scheduling.k8s.io/v1
 description: Used for udpfw dispatch Components to be scheduled with higher priority.
 kind: PriorityClass
 metadata:
-  name: {{ .Values.dispatch.daemonset.priorityClassName | default (include "udpfw.fullname" . ) }}
+  name: {{ .Values.dispatch.daemonset.priorityClassName | default (include "udpfw.dispatch.fullname" . ) }}
+  namespace: {{ .Release.Namespace | quote }}
 preemptionPolicy: {{ .Values.dispatch.daemonset.priorityPreemptionPolicyValue }}
 value: {{ .Values.dispatch.daemonset.priorityClassValue }}
 {{- end }}

@@ -2,9 +2,9 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "udpfw.fullname" . }}
+  name: {{ include "udpfw.nodelet-sidecar.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "udpfw.labels" . | nindent 4 }}
+  labels: {{- include "udpfw.nodelet-sidecar.labels" . | nindent 4 }}
     {{- with .Values.nodelet.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -12,7 +12,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "udpfw.fullname" . }}
+    name: {{ include "udpfw.nodelet-sidecar.fullname" . }}
   minReplicas: {{ .Values.nodelet.deployment.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.nodelet.deployment.autoscaling.maxReplicas }}
   metrics:

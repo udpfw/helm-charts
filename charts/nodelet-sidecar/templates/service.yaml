@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "udpfw.fullname" . }}-nodelet
+  name: {{ include "udpfw.nodelet-sidecar.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   {{- with .Values.nodelet.annotations }}
   annotations: {{- toYaml . | nindent 4 }}
   {{- end }}
-  labels: {{- include "udpfw.labels" . | nindent 4 }}
+  labels: {{- include "udpfw.nodelet-sidecar.labels" . | nindent 4 }}
     {{- with .Values.nodelet.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -23,5 +23,5 @@ spec:
     {{- with .Values.nodelet.service.ports }}
       {{- toYaml . | nindent 4}}
     {{- end }}
-  selector: {{- include "udpfw.selectorLabels" . | nindent 4 }}
+  selector: {{- include "udpfw.nodelet-sidecar.selectorLabels" . | nindent 4 }}
 {{- end }}

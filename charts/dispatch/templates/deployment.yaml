@@ -2,12 +2,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "udpfw.fullname" . }}
+  name: {{ include "udpfw.dispatch.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   {{- with .Values.dispatch.annotations }}
   annotations: {{- toYaml . | nindent 4 }}
   {{- end }}
-  labels: {{- include "udpfw.labels" . | nindent 4 }}
+  labels: {{- include "udpfw.dispatch.labels" . | nindent 4 }}
     {{- with .Values.dispatch.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -19,14 +19,14 @@ spec:
   strategy: {{- toYaml .Values.dispatch.updateStrategy | nindent 4 }}
   selector:
     matchLabels:
-      {{- include "udpfw.selectorLabels" . | nindent 6 }}
+      {{- include "udpfw.dispatch.selectorLabels" . | nindent 6 }}
       {{- with .Values.dispatch.pod.labels }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
   template:
     metadata:
       labels:
-        {{- include "udpfw.selectorLabels" . | nindent 8 }}
+        {{- include "udpfw.dispatch.selectorLabels" . | nindent 8 }}
         {{- with .Values.dispatch.pod.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
